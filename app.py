@@ -2,21 +2,127 @@ import streamlit as st
 from sympy import symbols, SOPform
 from sympy.logic.boolalg import Or, And, Not
 
-# ======================================
-# CONFIGURACIÓN
-# ======================================
+# ==================================================
+# CONFIG
+# ==================================================
 
 st.set_page_config(
     page_title="Solver MapKarnaugh By MARB",
     layout="wide"
 )
 
-st.title("Solver MapKarnaugh By MARB")
-st.caption("Fac. Electrónica UPAEP")
+# ==================================================
+# ESTILO
+# ==================================================
 
-# ======================================
+st.markdown("""
+<style>
+
+.stApp{
+    background-color:#d9d9d9;
+}
+
+.main-container{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:20px;
+
+    border:3px solid #777;
+
+    box-shadow:0px 0px 15px rgba(0,0,0,.25);
+
+}
+
+.titulo{
+
+    text-align:center;
+
+    font-size:36px;
+
+    font-weight:bold;
+
+    color:#154360;
+
+}
+
+.subtitulo{
+
+    text-align:center;
+
+    color:#666;
+
+    font-size:18px;
+
+}
+
+.mapa{
+
+    border:3px solid black;
+
+    border-radius:15px;
+
+    padding:20px;
+
+    background:#f8f8f8;
+
+}
+
+.resultado{
+
+    text-align:center;
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    color:#B00020;
+
+    padding:15px;
+
+}
+
+.stButton > button{
+
+    width:100%;
+
+    border-radius:12px;
+
+    height:45px;
+
+    font-weight:bold;
+
+    border:2px solid gray;
+
+}
+
+</style>
+""",unsafe_allow_html=True)
+
+
+st.markdown(
+"""
+<div class='main-container'>
+
+<div class='titulo'>
+Solver MapKarnaugh By MARB
+</div>
+
+<div class='subtitulo'>
+Facultad de Electrónica UPAEP
+</div>
+
+<br>
+
+""",
+unsafe_allow_html=True
+)
+
+# ==================================================
 # MEMORIA
-# ======================================
+# ==================================================
 
 if "kmap_values" not in st.session_state:
     st.session_state.kmap_values={}
@@ -27,9 +133,9 @@ if "vars_order" not in st.session_state:
 if "output_name" not in st.session_state:
     st.session_state.output_name="F"
 
-# ======================================
+# ==================================================
 # SUPERIOR
-# ======================================
+# ==================================================
 
 c1,c2,c3,c4=st.columns([1,1,2,2])
 
@@ -44,7 +150,11 @@ with c1:
 
 with c2:
 
-    if st.button("Invertir"):
+    st.write("")
+
+    if st.button(
+        "Invertir"
+    ):
 
         st.session_state.vars_order.reverse()
 
@@ -67,7 +177,6 @@ with c3:
             )
         )
 
-
 with c4:
 
     salida=st.text_input(
@@ -77,59 +186,42 @@ with c4:
 
     st.session_state.output_name=salida
 
-
 names=st.session_state.vars_order[:nvars]
 
-# ======================================
+# ==================================================
 # GRAY
-# ======================================
+# ==================================================
 
 if nvars==4:
 
     rows=4
     cols=4
 
-    row_codes=[
-        "00","01",
-        "11","10"
-    ]
+    row_codes=["00","01","11","10"]
 
-    col_codes=[
-        "00","01",
-        "11","10"
-    ]
+    col_codes=["00","01","11","10"]
 
 elif nvars==3:
 
     rows=2
     cols=4
 
-    row_codes=[
-        "0","1"
-    ]
+    row_codes=["0","1"]
 
-    col_codes=[
-        "00","01",
-        "11","10"
-    ]
+    col_codes=["00","01","11","10"]
 
 else:
 
     rows=2
     cols=2
 
-    row_codes=[
-        "0","1"
-    ]
+    row_codes=["0","1"]
 
-    col_codes=[
-        "0","1"
-    ]
+    col_codes=["0","1"]
 
-
-# ======================================
-# INICIALIZAR MAPA
-# ======================================
+# ==================================================
+# INICIALIZA MAPA
+# ==================================================
 
 for r in range(rows):
 
@@ -139,10 +231,9 @@ for r in range(rows):
 
             st.session_state.kmap_values[(r,c)]="0"
 
-
-# ======================================
-# VARIABLES ENCABEZADO
-# ======================================
+# ==================================================
+# ENCABEZADOS VARIABLES
+# ==================================================
 
 if nvars==4:
 
@@ -159,23 +250,29 @@ else:
     fila=names[0]
     columna=names[1]
 
-
 st.markdown("---")
 
-a,b,c=st.columns([1,4,1])
+st.markdown(
+f"""
+<center>
 
-with b:
+<h2>
+{fila} / {columna}
+</h2>
 
-    st.markdown(
-    f"""
-    ### {fila} / {columna}
-    """
-    )
+</center>
+""",
+unsafe_allow_html=True
+)
 
+# ==================================================
+# MAPA
+# ==================================================
 
-# ======================================
-# ENCABEZADOS COLUMNAS
-# ======================================
+st.markdown(
+"<div class='mapa'>",
+unsafe_allow_html=True
+)
 
 head=st.columns(cols+1)
 
@@ -186,11 +283,6 @@ for c in range(cols):
     head[c+1].markdown(
         f"### {col_codes[c]}"
     )
-
-
-# ======================================
-# MAPA
-# ======================================
 
 for r in range(rows):
 
@@ -216,7 +308,7 @@ for r in range(rows):
 
             icono="🟨"
 
-        texto=f"{icono} {valor}"
+        texto=f"{icono}{valor}"
 
         if line[c+1].button(
             texto,
@@ -225,28 +317,26 @@ for r in range(rows):
 
             if valor=="0":
 
-                st.session_state.kmap_values[
-                    (r,c)
-                ]="1"
+                st.session_state.kmap_values[(r,c)]="1"
 
             elif valor=="1":
 
-                st.session_state.kmap_values[
-                    (r,c)
-                ]="X"
+                st.session_state.kmap_values[(r,c)]="X"
 
             else:
 
-                st.session_state.kmap_values[
-                    (r,c)
-                ]="0"
+                st.session_state.kmap_values[(r,c)]="0"
 
             st.rerun()
 
+st.markdown(
+"</div>",
+unsafe_allow_html=True
+)
 
-# ======================================
-# SIMPLIFICACIÓN
-# ======================================
+# ==================================================
+# SIMPLIFICACION
+# ==================================================
 
 minterms=[]
 dontcares=[]
@@ -255,33 +345,19 @@ for r in range(rows):
 
     for c in range(cols):
 
-        bits=(
-            row_codes[r]
-            +
-            col_codes[c]
-        )
+        bits=row_codes[r]+col_codes[c]
 
-        index=int(
-            bits,
-            2
-        )
+        index=int(bits,2)
 
-        valor=st.session_state.kmap_values[
-            (r,c)
-        ]
+        valor=st.session_state.kmap_values[(r,c)]
 
         if valor=="1":
 
-            minterms.append(
-                index
-            )
+            minterms.append(index)
 
         elif valor=="X":
 
-            dontcares.append(
-                index
-            )
-
+            dontcares.append(index)
 
 variables=symbols(
     " ".join(names)
@@ -293,9 +369,9 @@ expr=SOPform(
     dontcares
 )
 
-# ======================================
+# ==================================================
 # FORMATO
-# ======================================
+# ==================================================
 
 def format_expression(expr):
 
@@ -318,43 +394,28 @@ def format_expression(expr):
 
         if term.is_Symbol:
 
-            variables[
-                str(term)
-            ]=False
+            variables[str(term)]=False
 
-        elif isinstance(
-            term,
-            Not
-        ):
+        elif isinstance(term,Not):
 
             variables[
-                str(
-                    term.args[0]
-                )
+                str(term.args[0])
             ]=True
 
-        elif isinstance(
-            term,
-            And
-        ):
+        elif isinstance(term,And):
 
-            for f in term.args:
+            for x in term.args:
 
-                if isinstance(
-                    f,
-                    Not
-                ):
+                if isinstance(x,Not):
 
                     variables[
-                        str(
-                            f.args[0]
-                        )
+                        str(x.args[0])
                     ]=True
 
                 else:
 
                     variables[
-                        str(f)
+                        str(x)
                     ]=False
 
         txt=""
@@ -375,11 +436,21 @@ def format_expression(expr):
 
     return " + ".join(salida)
 
-
 texto=format_expression(expr)
 
-st.markdown("---")
+st.markdown("<br>",unsafe_allow_html=True)
 
 st.markdown(
-f"# {st.session_state.output_name} = {texto}"
+f"""
+<div class='resultado'>
+
+{st.session_state.output_name}
+=
+{texto}
+
+</div>
+
+</div>
+""",
+unsafe_allow_html=True
 )
